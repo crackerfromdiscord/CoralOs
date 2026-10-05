@@ -33,7 +33,11 @@ class WelcomeConfig:
     accent_color: str = "#FF7A66"
     background_color: str = "#0B0F14"
     text_color: str = "#F2F4F7"
+    background_image: str = "coralos-wallpaper.png"
+    background_dim: int = 62
     show_branding: bool = True
+    branding_logo: str = "coralos-logo-wordmark.png"
+    branding_logo_height: int = 28
     branding_text: str = "CoralOS"
     avatar_size: int = 168
     min_display_ms: int = 1400
@@ -51,6 +55,24 @@ class WelcomeConfig:
 
 
 DEFAULTS = WelcomeConfig()
+
+
+def branding_dir(prefix: Optional[str] = None) -> Path:
+    prefix = prefix or os.environ.get("CORALOS_PREFIX")
+    if prefix:
+        return Path(prefix) / "share" / "coralos" / "branding"
+    return Path(__file__).resolve().parent.parent / "data" / "branding"
+
+
+def resolve_asset(value: str, prefix: Optional[str] = None) -> Optional[Path]:
+    """Absolute/~ paths are used as-is; bare names are looked up in the branding dir."""
+    value = value.strip()
+    if not value:
+        return None
+    path = Path(os.path.expanduser(value))
+    if not path.is_absolute():
+        path = branding_dir(prefix) / path
+    return path if path.is_file() else None
 
 
 def default_search_paths(prefix: Optional[str] = None) -> List[Path]:
@@ -88,6 +110,8 @@ def _coerce(name: str, raw: str, current):
         number = int(raw.strip())
         if number < 0:
             raise ValueError(f"{name} must be >= 0")
+        if name.endswith("_dim") and number > 100:
+            raise ValueError(f"{name} must be 0-100")
         return number
     if isinstance(current, list):
         return _parse_list(raw)

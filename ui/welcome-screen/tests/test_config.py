@@ -1,4 +1,4 @@
-from coralos_welcome.config import WelcomeConfig, apply_file, load_config
+from coralos_welcome.config import WelcomeConfig, apply_file, branding_dir, load_config, resolve_asset
 
 
 def write(tmp_path, name, body):
@@ -46,3 +46,31 @@ def test_shipped_defaults_file_matches_builtin():
     config = load_config(search_paths=[shipped], warnings=warnings)
     assert warnings == []
     assert config == WelcomeConfig()
+
+
+def test_background_dim_range(tmp_path):
+    conf = tmp_path / "w.conf"
+    conf.write_text("[welcome]\nbackground_dim = 140\n")
+    warnings = []
+    config = load_config(search_paths=[conf], warnings=warnings)
+    assert config.background_dim == WelcomeConfig().background_dim
+    assert any("background_dim" in w for w in warnings)
+
+
+def test_resolve_asset(tmp_path):
+    branding = tmp_path / "share" / "coralos" / "branding"
+    branding.mkdir(parents=True)
+    (branding / "logo.png").write_bytes(b"png")
+    other = tmp_path / "elsewhere.png"
+    other.write_bytes(b"png")
+    prefix = str(tmp_path)
+    assert branding_dir(prefix) == branding
+    assert resolve_asset("logo.png", prefix) == branding / "logo.png"
+    assert resolve_asset(str(other), prefix) == other
+    assert resolve_asset("missing.png", prefix) is None
+    assert resolve_asset("  ", prefix) is None
+
+
+def test_shipped_branding_assets_exist():
+    for name in (WelcomeConfig().background_image, WelcomeConfig().branding_logo):
+        assert resolve_asset(name) is not None, name

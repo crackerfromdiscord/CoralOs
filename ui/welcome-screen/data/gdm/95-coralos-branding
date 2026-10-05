@@ -1,5 +1,2 @@
-# CoralOS branding for the GDM login screen (Ubuntu/Debian gdm3).
-# gdm3 compiles /usr/share/gdm/dconf/* into its greeter defaults on start.
-# Only cosmetic keys live here; authentication settings are untouched.
 [org/gnome/login-screen]
-logo='@PREFIX@/share/coralos/branding/coralos-gdm-logo.svg'
+logo='@PREFIX@/share/coralos/branding/coralos-logo-wordmark.png'

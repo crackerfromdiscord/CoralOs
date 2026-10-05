@@ -13,10 +13,11 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
-from gi.repository import Gdk, Gio, GLib, Gtk  # noqa: E402
+gi.require_version("GdkPixbuf", "2.0")
+from gi.repository import Gdk, GdkPixbuf, Gio, GLib, Gtk  # noqa: E402
 
 from . import __version__  # noqa: E402
-from .config import WelcomeConfig, load_config  # noqa: E402
+from .config import WelcomeConfig, load_config, resolve_asset  # noqa: E402
 from .readiness import SessionReadiness, SimulatedProbe, build_probes  # noqa: E402
 from .ring import AvatarRing  # noqa: E402
 from .timeline import Phase, WelcomeTimeline  # noqa: E402
@@ -53,6 +54,23 @@ class WelcomeView:
         self.stage.add_css_class("stage")
         self.window.set_child(self.stage)
 
+        # Layers, bottom to top: wallpaper, shade, glow, avatar column, logo.
+        background = resolve_asset(config.background_image)
+        if background is not None:
+            picture = Gtk.Picture.new_for_filename(str(background))
+            picture.set_content_fit(Gtk.ContentFit.COVER)
+            picture.set_can_shrink(True)
+            self.stage.set_child(picture)
+            shade = Gtk.Box()
+            shade.add_css_class("shade")
+            shade.set_opacity(config.background_dim / 100.0)
+            shade.set_can_target(False)
+            self.stage.add_overlay(shade)
+        glow = Gtk.Box()
+        glow.add_css_class("glow")
+        glow.set_can_target(False)
+        self.stage.add_overlay(glow)
+
         column = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         column.set_halign(Gtk.Align.CENTER)
         column.set_valign(Gtk.Align.CENTER)
@@ -61,19 +79,38 @@ class WelcomeView:
         self.greeting = Gtk.Label(label=greeting)
         self.greeting.add_css_class("greeting")
         column.append(self.greeting)
-        self.stage.set_child(column)
+        self.stage.add_overlay(column)
 
-        if config.show_branding and config.branding_text:
-            brand = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-            brand.set_halign(Gtk.Align.CENTER)
-            brand.set_valign(Gtk.Align.END)
-            dot = Gtk.Label(label="\u25cf")
-            dot.add_css_class("brand-dot")
-            brand.append(dot)
-            text = Gtk.Label(label=config.branding_text.upper())
-            text.add_css_class("brand")
-            brand.append(text)
-            self.stage.add_overlay(brand)
+        if config.show_branding:
+            brand = self._branding(config)
+            if brand is not None:
+                brand.set_halign(Gtk.Align.CENTER)
+                brand.set_valign(Gtk.Align.END)
+                self.stage.add_overlay(brand)
+
+    @staticmethod
+    def _branding(config: WelcomeConfig):
+        logo = resolve_asset(config.branding_logo)
+        if logo is not None and config.branding_logo_height > 0:
+            try:
+                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(
+                    str(logo), -1, config.branding_logo_height, True
+                )
+                picture = Gtk.Picture.new_for_paintable(Gdk.Texture.new_for_pixbuf(pixbuf))
+                picture.add_css_class("brand-logo")
+                return picture
+            except GLib.Error as error:
+                log(f"branding logo {logo}: {error.message}")
+        if not config.branding_text:
+            return None
+        brand = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        dot = Gtk.Label(label="●")
+        dot.add_css_class("brand-dot")
+        brand.append(dot)
+        text = Gtk.Label(label=config.branding_text.upper())
+        text.add_css_class("brand")
+        brand.append(text)
+        return brand
 
     def apply(self, frame) -> None:
         self.ring.set_frame(frame)
@@ -119,6 +156,9 @@ class WelcomeApp(Gtk.Application):
             if monitor is None:
                 view.window.set_default_size(1280, 800)
             else:
+                # Size to the monitor first so the wallpaper's own size never drives the window.
+                geometry = monitor.get_geometry()
+                view.window.set_default_size(geometry.width, geometry.height)
                 view.window.fullscreen_on_monitor(monitor)
             if self.config.allow_skip:
                 self._add_skip_controllers(view.window)

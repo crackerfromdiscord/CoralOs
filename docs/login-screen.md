@@ -46,8 +46,27 @@ ring closes -> checkmark -> fade -> desktop
 | `data/coralos-welcome.service` | `/usr/local/lib/systemd/user/coralos-welcome.service`, enabled globally via `/etc/systemd/user/gnome-session-initialized.target.wants/` |
 | `data/welcome.conf` | `/usr/local/share/coralos/welcome.conf` (shipped defaults) |
 | (created if missing) | `/etc/coralos/welcome.conf` (system overrides) |
-| `data/gdm/95-coralos-branding` | `/usr/share/gdm/dconf/95-coralos-branding` (GDM logo) |
-| `data/coralos-gdm-logo.svg` | `/usr/local/share/coralos/branding/coralos-gdm-logo.svg` |
+| `data/branding/*.png` | `/usr/local/share/coralos/branding/` (wallpapers, logo, logo + wordmark) |
+| `data/gdm/95-coralos-branding` | `/usr/share/gdm/dconf/95-coralos-branding` (GDM logo: `coralos-logo-wordmark.png`) |
+| `data/desktop/95_coralos-wallpaper.gschema.override` | `/usr/share/glib-2.0/schemas/` (default desktop + lock screen wallpaper) |
+| `data/desktop/coralos-wallpapers.xml` | `/usr/share/gnome-background-properties/` (lists both wallpapers in Settings > Appearance) |
+
+### Branding assets
+
+| File | Used for |
+| --- | --- |
+| `coralos-wallpaper.png` | Welcome screen backdrop (dimmed by `background_dim`) and the default desktop/lock-screen wallpaper, so the fade lands on the same picture. |
+| `coralos-wallpaper-branded.png` | Optional wallpaper with the logo, selectable in Settings > Appearance. |
+| `coralos-logo-wordmark.png` | GDM login screen logo, and the small logo at the bottom of the welcome screen. |
+| `coralos-logo.png` | Square logo mark, for places that need an icon. |
+
+To change them, replace the PNGs (keep the names) and reinstall, or point
+`background_image` / `branding_logo` in `welcome.conf` at other files.
+
+The default-wallpaper override only changes GNOME's *default*. Anyone who has
+already picked a wallpaper keeps it; to switch to CoralOS run
+`gsettings reset org.gnome.desktop.background picture-uri` and
+`gsettings reset org.gnome.desktop.background picture-uri-dark`.
 
 Code layout, so later work (e.g. a CoralOS Settings page) knows where to plug in:
 
@@ -63,7 +82,8 @@ Code layout, so later work (e.g. a CoralOS Settings page) knows where to plug in
 ```sh
 git clone https://github.com/crackerfromdiscord/CoralOs.git
 cd CoralOs/ui/welcome-screen
-sudo ./install.sh                # add --no-gdm-branding to leave GDM 100% stock
+sudo ./install.sh                # --no-gdm-branding: leave GDM 100% stock
+                                 # --no-wallpaper: don't change the default wallpaper
 ```
 
 The installer pulls in `python3-gi python3-gi-cairo gir1.2-gtk-4.0` if they are
@@ -118,8 +138,9 @@ Any one of these works. They are listed from lightest to most complete:
   cd CoralOs/ui/welcome-screen
   sudo ./uninstall.sh            # add --purge to also delete /etc/coralos/welcome.conf
   ```
-  This disables the unit, deletes the installed files and the GDM logo
-  drop-in, and recompiles GDM's settings. The stock login comes back from the
+  This disables the unit, deletes the installed files, the GDM logo drop-in
+  and the wallpaper override, and recompiles GDM's settings and the GSettings
+  schemas. Users who never changed their wallpaper go back to Ubuntu's. The stock login comes back from the
   next login. No reboot is needed.
 - **Manual fallback** (if the repo isn't around):
   ```sh
@@ -127,6 +148,8 @@ Any one of these works. They are listed from lightest to most complete:
   sudo rm -rf /usr/local/lib/coralos /usr/local/share/coralos /usr/local/bin/coralos-welcome \
               /usr/local/lib/systemd/user/coralos-welcome.service /etc/coralos
   sudo rm -f /usr/share/gdm/dconf/95-coralos-branding && sudo /usr/share/gdm/generate-config
+  sudo rm -f /usr/share/glib-2.0/schemas/95_coralos-wallpaper.gschema.override              /usr/share/gnome-background-properties/coralos-wallpapers.xml
+  sudo glib-compile-schemas /usr/share/glib-2.0/schemas
   ```
 - **Locked out of the desktop?** (This shouldn't happen, because the splash
   exits on its own.) Press Ctrl+Alt+F3, log in on the text console, and run

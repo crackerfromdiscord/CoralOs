@@ -1,0 +1,19 @@
+# CoralOS default wallpaper. Only changes the *default*: users who already picked
+# a wallpaper keep theirs. 95_ sorts after Ubuntu's 10_ubuntu-settings override.
+[org.gnome.desktop.background]
+picture-uri='file://@PREFIX@/share/coralos/branding/coralos-wallpaper.png'
+picture-uri-dark='file://@PREFIX@/share/coralos/branding/coralos-wallpaper.png'
+picture-options='zoom'
+primary-color='#0B2A3A'
+
+[org.gnome.desktop.background:ubuntu]
+picture-uri='file://@PREFIX@/share/coralos/branding/coralos-wallpaper.png'
+picture-uri-dark='file://@PREFIX@/share/coralos/branding/coralos-wallpaper.png'
+picture-options='zoom'
+primary-color='#0B2A3A'
+
+[org.gnome.desktop.screensaver]
+picture-uri='file://@PREFIX@/share/coralos/branding/coralos-wallpaper.png'
+
+[org.gnome.desktop.screensaver:ubuntu]
+picture-uri='file://@PREFIX@/share/coralos/branding/coralos-wallpaper.png'

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>CoralOS Reef</name>
+    <filename>@PREFIX@/share/coralos/branding/coralos-wallpaper.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#0B2A3A</pcolor>
+    <scolor>#0B2A3A</scolor>
+  </wallpaper>
+  <wallpaper deleted="false">
+    <name>CoralOS Reef (logo)</name>
+    <filename>@PREFIX@/share/coralos/branding/coralos-wallpaper-branded.png</filename>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#0B2A3A</pcolor>
+    <scolor>#0B2A3A</scolor>
+  </wallpaper>
+</wallpapers>

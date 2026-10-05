@@ -31,8 +31,15 @@ rm -f "$UNIT_DIR/coralos-welcome.service"
 rm -rf "$PREFIX/lib/coralos/welcome"
 rmdir "$PREFIX/lib/coralos" 2>/dev/null || true
 rm -f "$PREFIX/bin/coralos-welcome"
-rm -f "$PREFIX/share/coralos/welcome.conf" "$PREFIX/share/coralos/branding/coralos-gdm-logo.svg"
-rmdir "$PREFIX/share/coralos/branding" "$PREFIX/share/coralos" 2>/dev/null || true
+rm -f "$PREFIX/share/coralos/welcome.conf"
+rm -rf "$PREFIX/share/coralos/branding"
+rmdir "$PREFIX/share/coralos" 2>/dev/null || true
+
+rm -f /usr/share/gnome-background-properties/coralos-wallpapers.xml
+if [ -e /usr/share/glib-2.0/schemas/95_coralos-wallpaper.gschema.override ]; then
+    rm -f /usr/share/glib-2.0/schemas/95_coralos-wallpaper.gschema.override
+    glib-compile-schemas /usr/share/glib-2.0/schemas
+fi
 
 if [ -e /usr/share/gdm/dconf/95-coralos-branding ]; then
     rm -f /usr/share/gdm/dconf/95-coralos-branding
