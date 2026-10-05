@@ -1,0 +1,7 @@
+#!/bin/sh
+# Launcher for the CoralOS welcome screen. install.sh replaces @PREFIX@.
+CORALOS_PREFIX="${CORALOS_PREFIX:-@PREFIX@}"
+export CORALOS_PREFIX
+PYTHONPATH="$CORALOS_PREFIX/lib/coralos/welcome${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH
+exec /usr/bin/python3 -m coralos_welcome "$@"

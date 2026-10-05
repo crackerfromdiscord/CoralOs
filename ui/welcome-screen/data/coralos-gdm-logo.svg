@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="48" viewBox="0 0 240 48">
+  <circle cx="18" cy="24" r="7" fill="#FF7A66"/>
+  <circle cx="18" cy="24" r="12" fill="none" stroke="#FF7A66" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="44" y="31" fill="#F2F4F7" fill-opacity="0.85" font-family="Cantarell, Ubuntu, sans-serif"
+        font-size="20" font-weight="600" letter-spacing="6">CORALOS</text>
+</svg>

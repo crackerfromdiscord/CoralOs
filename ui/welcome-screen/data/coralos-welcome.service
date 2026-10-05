@@ -1,0 +1,18 @@
+[Unit]
+Description=CoralOS welcome screen
+Documentation=https://github.com/crackerfromdiscord/CoralOs/blob/main/docs/login-screen.md
+# Start as soon as GNOME Shell is up (it is ordered before this target), and
+# stop together with the graphical session.
+After=gnome-session-initialized.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+Slice=session.slice
+ExecStart=@PREFIX@/bin/coralos-welcome
+Restart=no
+# Fail-safe: the splash can never outlive this, whatever happens.
+RuntimeMaxSec=90
+
+[Install]
+WantedBy=gnome-session-initialized.target

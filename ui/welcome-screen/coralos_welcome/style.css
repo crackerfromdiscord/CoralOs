@@ -1,0 +1,33 @@
+/* CoralOS welcome screen. $accent, $background and $text come from welcome.conf. */
+window.coralos-welcome {
+  background: transparent;
+}
+
+.coralos-welcome .stage {
+  background-color: $background;
+  background-image:
+    radial-gradient(circle at 50% 40%, alpha($accent, 0.09), transparent 45%),
+    radial-gradient(circle at 50% 130%, alpha(#4f8cff, 0.07), transparent 60%);
+}
+
+.coralos-welcome .greeting {
+  color: $text;
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: 0.4px;
+  margin-top: 18px;
+}
+
+.coralos-welcome .brand {
+  color: alpha($text, 0.32);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 5px;
+  margin-bottom: 36px;
+}
+
+.coralos-welcome .brand-dot {
+  color: alpha($accent, 0.8);
+  font-size: 9px;
+  margin-bottom: 37px;
+}
